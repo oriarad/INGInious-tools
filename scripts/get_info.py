@@ -49,16 +49,18 @@ class Inginious:
                 all_tasks = [task for task in student.keys() if 'task_grades[' in task]
                 nonbonus_tasks = [task for task in all_tasks for bonus in self.bonus_tasks if bonus not in task]
                 bonus_tasks = [task for task in all_tasks for bonus in self.bonus_tasks if bonus in task]
+                bonus_done = [student[task] for task in bonus_tasks].count('100.0')
                 grades = [float(student[task]) if len(student[task]) > 0 else 0.0 for task in nonbonus_tasks]
-                print(student['id'], student['realname'], round(sum(grades)/len(grades)))
-                mylist.append(','.join([course, student['id'], student['realname'], str(round(sum(grades)/len(grades)))]))
+                final_grade = round(sum(grades)/len(grades)) + bonus_done
+                print(student['id'], student['realname'], final_grade)
+                mylist.append(','.join([course, student['id'], student['realname'], str(final_grade)]))
             print()
 
         with open(REPORT_FILENAME,'w', encoding="utf-8") as f:
             f.write('\n'.join(mylist))
 
 def main():
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 3:
         ing_url = sys.argv[1]
         ing_user = sys.argv[2]
         ing_pass = sys.argv[3]
@@ -66,7 +68,7 @@ def main():
         ing_url = os.environ['ING_URL']
         ing_user = os.environ['ING_USER']
         ing_pass = os.environ['ING_PASS']
-    ing = Inginious(ing_url, ing_user, ing_pass, bonus=['01-04-03','06-02-04', '08-02-04', '09-03-02'])
+    ing = Inginious(ing_url, ing_user, ing_pass, bonus=['01-04-03', '05-03-07', '06-02-04', '07-02-07', '08-02-04', '09-03-02'])
     ing.generate_grades_report()
 
 
